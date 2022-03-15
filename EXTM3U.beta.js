@@ -6,24 +6,25 @@ function EXTM3U(name, opts) {
 			Object.assign(this, opts)
 		};
 
-		parse(m3u8 = new String, format = "EXT-X-MEDIA", options = []) {
+		parse(m3u8 = "", format = "EXT-X-MEDIA", options = []) {
 			$.log(`🚧 ${$.name}, parse EXTM3U`, "");
 			const EXTM3U_headers_Regex = /^#(?<fileType>EXTM3U)?[^]*/;
-			const EXTM3U_option_Regex = /^#(?<EXT>EXT-X-[^:]+)$/m;
-			const EXTM3U_body_Regex = /^(?<EXT>(EXT|AIV)[^:]+):(?<OPTION>.+)([^](?<URI>.+))?/;
-			$.log(`🚧 ${$.name}, parse EXTM3U`, `m3u8.split: ${m3u8.split(/[^]#/)}`, "");
+			const EXTM3U_option_Regex = /^#(?<EXT>EXT-X-[^:]+)$/gm;
+			const EXTM3U_body_Regex = /^(?<EXT>(EXT|AIV)[^:]+):(?<OPTION>.+)([^](?<URI>.+))?[^]*$/;
 			let json = {
 				headers: m3u8.match(EXTM3U_headers_Regex)?.groups ?? "",
-				option: m3u8.match(EXTM3U_option_Regex)?.groups ?? [],
-				body: m3u8.split(/[(\r\n)\r\n]#/).map(item => item = item.match(EXTM3U_body_Regex)?.groups ?? "")
+				option: m3u8.match(EXTM3U_option_Regex) ?? [],
+				body: m3u8.split(/[^]#/).map(item => item = item.match(EXTM3U_body_Regex)?.groups ?? "")
 			};
 			$.log(`🚧 ${$.name}, parse EXTM3U`, `json.headers: ${JSON.stringify(json.headers)}`, "");
 			$.log(`🚧 ${$.name}, parse EXTM3U`, `json.option: ${JSON.stringify(json.option)}`, "");
 			$.log(`🚧 ${$.name}, parse EXTM3U`, `json.body: ${JSON.stringify(json.body)}`, "");
 			json.body = json.body.map(item => {
-				if (item?.EXT == format) item.OPTION = Object.fromEntries(item.OPTION.split(",").map(item => item.split("=")));
-				//$.log(`🚧 ${$.name}, parse EXTM3U`, `item.OPTION ${JSON.stringify(item.OPTION)}`, "");
-				//$.log(`🚧 ${$.name}, parse EXTM3U`, `item ${JSON.stringify(item)}`, "");
+				//$.log(`🚧 ${$.name}, parse EXTM3U`, `before: item.OPTION ${JSON.stringify(item.OPTION)}`, "");
+				$.log(`🚧 ${$.name}, parse EXTM3U`, `before: iitem.OPTION.split(",") ${JSON.stringify(item.OPTION?.split(/,(?=[A-Z])/) ?? "")}`, "");
+				if (item?.EXT == format) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split("=")));
+				//$.log(`🚧 ${$.name}, parse EXTM3U`, `after: item.OPTION ${JSON.stringify(item.OPTION)}`, "");
+				//$.log(`🚧 ${$.name}, parse EXTM3U`, `after: item ${JSON.stringify(item)}`, "");
 				return item
 			});
 			$.log(`🚧 ${$.name}, parse WebVTT`, `json.body: ${JSON.stringify(json.body)}`, "");
