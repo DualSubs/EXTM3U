@@ -6,7 +6,7 @@ function EXTM3U(name, opts) {
 			Object.assign(this, opts)
 		};
 
-		parse(m3u8 = "", format = "EXT-X-MEDIA", options = []) {
+		parse(m3u8 = "", options = []) {
 			const EXTM3U_headers_Regex = /^#(?<fileType>EXTM3U)?[^]*/;
 			const EXTM3U_option_Regex = /^#(?<EXT>EXT-X-[^:]+)$/gm;
 			const EXTM3U_body_Regex = /^(?<EXT>(EXT|AIV)[^:]+):(?<OPTION>.+)([^](?<URI>.+))?[^]*$/;
@@ -16,22 +16,20 @@ function EXTM3U(name, opts) {
 				body: m3u8.split(/[^]#/).map(item => item = item.match(EXTM3U_body_Regex)?.groups ?? "")
 			};
 			json.body = json.body.map(item => {
-				if (item?.EXT == format) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split("=")));
+				if (/=/.test(item?.OPTION)) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split(/=(.*)/)));
 				return item
 			});
 			return json
 		};
 
-		stringify(json = { headers: {}, option: [], body: [] }, format = "EXT-X-MEDIA", options = ["\n"]) {
+		stringify(json = { headers: {}, option: [], body: [] }, options = ["\n"]) {
 			const newLine = (options.includes("\n")) ? "\n" : (options.includes("\r")) ? "\r" : (options.includes("\r\n")) ? "\r\n" : "\n";
 			let m3u8 = [
 				json.headers = "#" + json.headers.fileType,
 				json.option = json.option.join(newLine),
 				json.body = json.body.map(item => {
 					if (item) {
-						if (item?.EXT == format) {
-							item.OPTION = Object.entries(item.OPTION).map(item => item = item.join("=")).join(",");
-						}
+						if (typeof item?.OPTION == "object") item.OPTION = Object.entries(item.OPTION).map(item => item = item.join("=")).join(",");
 						return item = (item.EXT == "EXT-X-STREAM-INF") ? "#" + item.EXT + ":" + item.OPTION + newLine + item.URI
 							: "#" + item.EXT + ":" + item.OPTION
 					}

@@ -6,7 +6,7 @@ function EXTM3U(name, opts) {
 			Object.assign(this, opts)
 		};
 
-		parse(m3u8 = "", format = "EXT-X-MEDIA", options = []) {
+		parse(m3u8 = "", options = []) {
 			$.log(`🚧 ${$.name}, parse EXTM3U`, "");
 			const EXTM3U_headers_Regex = /^#(?<fileType>EXTM3U)?[^]*/;
 			const EXTM3U_option_Regex = /^#(?<EXT>EXT-X-[^:]+)$/gm;
@@ -22,7 +22,7 @@ function EXTM3U(name, opts) {
 			json.body = json.body.map(item => {
 				//$.log(`🚧 ${$.name}, parse EXTM3U`, `before: item.OPTION ${JSON.stringify(item.OPTION)}`, "");
 				$.log(`🚧 ${$.name}, parse EXTM3U`, `before: item.OPTION.split(/,(?=[A-Z])/) ${JSON.stringify(item.OPTION?.split(/,(?=[A-Z])/) ?? "")}`, "");
-				if (item?.EXT == format) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split(/=/)));
+				if (/=/.test(item?.OPTION)) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split(/=(.*)/)));
 				//$.log(`🚧 ${$.name}, parse EXTM3U`, `after: item.OPTION ${JSON.stringify(item.OPTION)}`, "");
 				//$.log(`🚧 ${$.name}, parse EXTM3U`, `after: item ${JSON.stringify(item)}`, "");
 				return item
@@ -31,7 +31,7 @@ function EXTM3U(name, opts) {
 			return json
 		};
 
-		stringify(json = { headers: {}, option: [], body: [] }, format = "EXT-X-MEDIA", options = ["\n"]) {
+		stringify(json = { headers: {}, option: [], body: [] }, options = ["\n"]) {
 			$.log(`🚧 ${$.name}, stringify EXTM3U`, "");
 			const newLine = (options.includes("\n")) ? "\n" : (options.includes("\r")) ? "\r" : (options.includes("\r\n")) ? "\r\n" : "\n";
 			let m3u8 = [
@@ -39,7 +39,7 @@ function EXTM3U(name, opts) {
 				json.option = json.option.join(newLine),
 				json.body = json.body.map(item => {
 					if (item) {
-						if (item?.EXT == format) {
+						if (typeof item?.OPTION == "object") {
 							/***************** v0.5.0-beta *****************/
 							item.OPTION = Object.entries(item.OPTION).map(item => item = item.join("=")).join(",");
 							// 按步骤分行写法
