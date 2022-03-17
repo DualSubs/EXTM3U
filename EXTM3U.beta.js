@@ -21,8 +21,8 @@ function EXTM3U(name, opts) {
 			$.log(`🚧 ${$.name}, parse EXTM3U`, `json.body: ${JSON.stringify(json.body)}`, "");
 			json.body = json.body.map(item => {
 				//$.log(`🚧 ${$.name}, parse EXTM3U`, `before: item.OPTION ${JSON.stringify(item.OPTION)}`, "");
-				$.log(`🚧 ${$.name}, parse EXTM3U`, `before: iitem.OPTION.split(",") ${JSON.stringify(item.OPTION?.split(/,(?=[A-Z])/) ?? "")}`, "");
-				if (item?.EXT == format) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split("=")));
+				$.log(`🚧 ${$.name}, parse EXTM3U`, `before: item.OPTION.split(/,(?=[A-Z])/) ${JSON.stringify(item.OPTION?.split(/,(?=[A-Z])/) ?? "")}`, "");
+				if (item?.EXT == format) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split(/=/)));
 				//$.log(`🚧 ${$.name}, parse EXTM3U`, `after: item.OPTION ${JSON.stringify(item.OPTION)}`, "");
 				//$.log(`🚧 ${$.name}, parse EXTM3U`, `after: item ${JSON.stringify(item)}`, "");
 				return item
