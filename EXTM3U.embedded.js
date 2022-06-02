@@ -2,41 +2,39 @@
 function EXTM3U(opts) {
 	return new (class {
 		constructor(opts) {
-			this.name = "EXTM3U v0.6.0";
+			this.name = "EXTM3U v0.7.0";
 			this.opts = opts;
 			this.newLine = (this.opts.includes("\n")) ? "\n" : (this.opts.includes("\r")) ? "\r" : (this.opts.includes("\r\n")) ? "\r\n" : "\n";
-			this.m3u8 = new String;
-			this.json = { headers: {}, option: [], body: [] };
 		};
 
-		parse(m3u8 = this.m3u8) {
-			const EXTM3U_headers_Regex = /^#(?<fileType>EXTM3U)?[^]*/;
-			const EXTM3U_option_Regex = /^#(?<EXT>EXT-X-[^:]+)$/gm;
-			const EXTM3U_body_Regex = /^(?<EXT>(EXT|AIV)[^:]+):(?<OPTION>.+)([^](?<URI>.+))?[^]*$/;
-			let json = {
-				headers: m3u8.match(EXTM3U_headers_Regex)?.groups ?? "",
-				option: m3u8.match(EXTM3U_option_Regex) ?? [],
-				body: m3u8.split(/[^]#/).map(item => item = item.match(EXTM3U_body_Regex)?.groups ?? "")
-			};
-			json.body = json.body.map(item => {
-				if (/=/.test(item?.OPTION) && this.opts.includes(item.EXT)) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split(/=(.*)/)));
+		parse(m3u8 = new String) {
+			//$.log(`🚧 ${$.name}, parse EXTM3U`, "");
+			/***************** v0.7.0-beta *****************/
+			const EXTM3U_Regex = /^(?<TYPE>(?:EXT|AIV)[^#:]+):?(?<OPTION>.+)?[\r\n]?(?<URI>.+)?$/;
+			let json = m3u8.replace(/\r\n/g, "\n").split(/[\r\n]#/).map(v => v.match(EXTM3U_Regex)?.groups ?? v)
+			//$.log(`🚧 ${$.name}, parse EXTM3U`, `json: ${JSON.stringify(json)}`, "");
+			json = json.map(item => {
+				//$.log(`🚧 ${$.name}, parse EXTM3U`, `before: item.OPTION.split(/,(?=[A-Z])/) ${JSON.stringify(item.OPTION?.split(/,(?=[A-Z])/) ?? "")}`, "");
+				if (/=/.test(item?.OPTION) && this.opts.includes(item.TYPE)) item.OPTION = Object.fromEntries(item.OPTION.split(/,(?=[A-Z])/).map(item => item.split(/=(.*)/)));
 				return item
 			});
+			//$.log(`🚧 ${$.name}, parse WebVTT`, `json: ${JSON.stringify(json)}`, "");
 			return json
 		};
 
-		stringify(json = this.json) {
-			let m3u8 = [
-				json.headers = "#" + json.headers.fileType,
-				json.option = json.option.join(this.newLine),
-				json.body = json.body.map(item => {
-					if (item) {
-						if (typeof item?.OPTION == "object") item.OPTION = Object.entries(item.OPTION).map(item => item = item.join("=")).join(",");
-						return item = (item.EXT == "EXT-X-STREAM-INF") ? "#" + item.EXT + ":" + item.OPTION + this.newLine + item.URI
-							: "#" + item.EXT + ":" + item.OPTION
-					}
-				}).join(this.newLine)
-			].join(this.newLine);
+		stringify(json = new Array) {
+			//$.log(`🚧 ${$.name}, stringify EXTM3U`, "");
+			if (!json?.[0]?.includes("#EXTM3U")) json.unshift("#EXTM3U")
+			let m3u8 = json.map(item => {
+				if (typeof item?.OPTION == "object") item.OPTION = Object.entries(item.OPTION).map(item => item = item.join("=")).join(",");
+				/***************** v0.7.0-beta *****************/
+				return item = (item.URI) ? item.TYPE + ":" + item.OPTION + this.newLine + item.URI
+					: (item.OPTION) ? item = item.TYPE + ":" + item.OPTION
+						: (item.TYPE) ? item = item.TYPE
+							: item = item
+			})
+			m3u8 = m3u8.join(this.newLine + "#")
+			//$.log(`🚧 ${$.name}, stringify EXTM3U`, `m3u8: ${m3u8}`, "");
 			return m3u8
 		};
 	})(opts)
