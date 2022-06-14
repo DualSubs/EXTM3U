@@ -2,7 +2,7 @@
 function EXTM3U(opts) {
 	return new (class {
 		constructor(opts) {
-			this.name = "EXTM3U v0.7.0";
+			this.name = "EXTM3U v0.7.1";
 			this.opts = opts;
 			this.newLine = (this.opts.includes("\n")) ? "\n" : (this.opts.includes("\r")) ? "\r" : (this.opts.includes("\r\n")) ? "\r\n" : "\n";
 		};
@@ -28,10 +28,10 @@ function EXTM3U(opts) {
 			let m3u8 = json.map(item => {
 				if (typeof item?.OPTION == "object") item.OPTION = Object.entries(item.OPTION).map(item => item = item.join("=")).join(",");
 				/***************** v0.7.0-beta *****************/
-				return item = (item.URI) ? item.TYPE + ":" + item.OPTION + this.newLine + item.URI
-					: (item.OPTION) ? item = item.TYPE + ":" + item.OPTION
-						: (item.TYPE) ? item = item.TYPE
-							: item = item
+				return item = (item?.URI) ? item.TYPE + ":" + item.OPTION + this.newLine + item.URI
+					: (item?.OPTION) ? item.TYPE + ":" + item.OPTION
+						: (item?.TYPE) ? item.TYPE
+							: item
 			})
 			m3u8 = m3u8.join(this.newLine + "#")
 			$.log(`🚧 ${$.name}, stringify EXTM3U`, `m3u8: ${m3u8}`, "");
