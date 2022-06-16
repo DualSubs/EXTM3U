@@ -2,7 +2,7 @@
 function EXTM3U(opts) {
 	return new (class {
 		constructor(opts) {
-			this.name = "EXTM3U v0.7.1";
+			this.name = "EXTM3U v0.7.2";
 			this.opts = opts;
 			this.newLine = (this.opts.includes("\n")) ? "\n" : (this.opts.includes("\r")) ? "\r" : (this.opts.includes("\r\n")) ? "\r\n" : "\n";
 		};
@@ -11,7 +11,7 @@ function EXTM3U(opts) {
 			//$.log(`🚧 ${$.name}, parse EXTM3U`, "");
 			/***************** v0.7.0-beta *****************/
 			const EXTM3U_Regex = /^(?<TYPE>(?:EXT|AIV)[^#:]+):?(?<OPTION>.+)?[\r\n]?(?<URI>.+)?$/;
-			let json = m3u8.replace(/\r\n/g, "\n").split(/[\r\n]#/).map(v => v.match(EXTM3U_Regex)?.groups ?? v)
+			let json = m3u8.replace(/\r\n/g, "\n").split(/[\r\n]+#/).map(v => v.match(EXTM3U_Regex)?.groups ?? v)
 			//$.log(`🚧 ${$.name}, parse EXTM3U`, `json: ${JSON.stringify(json)}`, "");
 			json = json.map(item => {
 				//$.log(`🚧 ${$.name}, parse EXTM3U`, `before: item.OPTION.split(/,(?=[A-Z])/) ${JSON.stringify(item.OPTION?.split(/,(?=[A-Z])/) ?? "")}`, "");
