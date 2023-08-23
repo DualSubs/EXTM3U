@@ -2,7 +2,7 @@
 function EXTM3U(opts) {
 	return new (class {
 		constructor(opts) {
-			this.name = "EXTM3U v0.8.3";
+			this.name = "EXTM3U v0.8.4";
 			this.opts = opts;
 			this.newLine = (this.opts.includes("\n")) ? "\n" : (this.opts.includes("\r")) ? "\r" : (this.opts.includes("\r\n")) ? "\r\n" : "\n";
 		};
@@ -10,9 +10,11 @@ function EXTM3U(opts) {
 		parse(m3u8 = new String) {
 			console.log(`☑️ ${this.name}, parse EXTM3U`, "");
 			/***************** v0.8.2-beta *****************/
-			const EXTM3U_Regex = /^(?:[\s\r\n]{1})|(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)|(?<NOTE>#.+))(?::(?<OPTION>.+))?[\s\r\n]?(?<URI>[^#\s\r\n]+)?$/gm;
+			//const EXTM3U_Regex = /^(?:[\s\r\n]{1})|(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)|(?<NOTE>#.+))(?::(?<OPTION>.+))?[\s\r\n]?(?<URI>[^#\s\r\n]+)?$/gm;
+			//const EXTM3U_Regex = /^(((?<TAG>#(EXT|AIV)[^#:\s\r\n]+)(:(?<OPTION>[^\r\n]+))?([\r\n](?<URI>[^#\s\r\n]+))?)|(?<NOTE>#[^\r\n]+))[\r\n]?$/gm;
+			const EXTM3U_Regex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:[\r\n](?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)[\r\n]?$/gm;
 			//let array = [...m3u8.matchAll(EXTM3U_Regex)]
-			//array.forEach(item => console.log(`🚧 ${this.name}, parse EXTM3U`, `item.groups: ${JSON.stringify(item?.groups)}`, ""));
+			//array.forEach(item => console.log(`🚧 ${this.name}, parse EXTM3U, item.groups: ${JSON.stringify(item?.groups)}`, ""));
 			let json = [...m3u8.matchAll(EXTM3U_Regex)].map(item => {
 				item = item?.groups || item;
 				//console.log(`🚧 ${this.name}, parse EXTM3U`, `before: item.OPTION.split(/,\s*(?![^"]*",)/) ${JSON.stringify(`${item.OPTION}\,`?.split(/,\s*(?![^"]*",)/) ?? "")}`, "");
@@ -36,7 +38,7 @@ function EXTM3U(opts) {
 				return item
 			});
 			*/
-			console.log(`✅ ${this.name}, parse WebVTT`, `json: ${JSON.stringify(json)}`, "");
+			console.log(`✅ ${this.name}, parse WebVTT, json: ${JSON.stringify(json)}`, "");
 			return json
 		};
 
@@ -84,7 +86,7 @@ function EXTM3U(opts) {
 							: (item?.NOTE) ? item.NOTE
 								: "";
 			}).join(this.newLine);
-			console.log(`✅ ${this.name}, stringify EXTM3U`, `m3u8: ${m3u8}`, "");
+			console.log(`✅ ${this.name}, stringify EXTM3U, m3u8: ${m3u8}`, "");
 			return m3u8
 		};
 	})(opts)
