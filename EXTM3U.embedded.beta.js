@@ -12,7 +12,8 @@ function EXTM3U(opts) {
 			/***************** v0.8.2-beta *****************/
 			//const EXTM3U_Regex = /^(?:[\s\r\n]{1})|(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)|(?<NOTE>#.+))(?::(?<OPTION>.+))?[\s\r\n]?(?<URI>[^#\s\r\n]+)?$/gm;
 			//const EXTM3U_Regex = /^(((?<TAG>#(EXT|AIV)[^#:\s\r\n]+)(:(?<OPTION>[^\r\n]+))?([\r\n](?<URI>[^#\s\r\n]+))?)|(?<NOTE>#[^\r\n]+))[\r\n]?$/gm;
-			const EXTM3U_Regex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:[\r\n](?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)[\r\n]?$/gm;
+			//const EXTM3U_Regex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:[\r\n](?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)[\r\n]?$/gm;
+			const EXTM3U_Regex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:(?:\r\n|\r|\n)(?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)(?:\r\n|\r|\n)?$/gm;
 			//let array = [...m3u8.matchAll(EXTM3U_Regex)]
 			//array.forEach(item => console.log(`🚧 ${this.name}, parse EXTM3U, item.groups: ${JSON.stringify(item?.groups)}`, ""));
 			let json = [...m3u8.matchAll(EXTM3U_Regex)].map(item => {
