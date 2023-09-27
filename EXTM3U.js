@@ -1,16 +1,13 @@
 // refer: https://datatracker.ietf.org/doc/html/draft-pantos-http-live-streaming-08
 export class EXTM3U {
 	constructor(opts) {
-		this.name = "EXTM3U v0.8.2";
+		this.name = "EXTM3U v0.8.5";
 		this.opts = opts;
 		this.newLine = (this.opts.includes("\n")) ? "\n" : (this.opts.includes("\r")) ? "\r" : (this.opts.includes("\r\n")) ? "\r\n" : "\n";
 	};
 
-
 	parse(m3u8 = new String) {
-		console.log(`☑️ ${this.name}, parse EXTM3U`, "");
-		/***************** v0.8.2-beta *****************/
-		const EXTM3U_Regex = /^(?:[\s\r\n]{1})|(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)|(?<NOTE>#.+))(?::(?<OPTION>.+))?[\s\r\n]?(?<URI>[^#\s\r\n]+)?$/gm;
+		const EXTM3U_Regex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:(?:\r\n|\r|\n)(?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)(?:\r\n|\r|\n)?$/gm;
 		let json = [...m3u8.matchAll(EXTM3U_Regex)].map(item => {
 			item = item?.groups || item;
 			if (/=/.test(item?.OPTION)) item.OPTION = Object.fromEntries(`${item.OPTION}\,`.split(/,\s*(?![^"]*",)/).slice(0, -1).map(option => {
@@ -20,19 +17,17 @@ export class EXTM3U {
 			}));
 			return item
 		});
-		console.log(`✅ ${this.name}, parse WebVTT`, `json: ${JSON.stringify(json)}`, "");
 		return json
 	};
 
 	stringify(json = new Array) {
-		console.log(`☑️ ${this.name}, stringify EXTM3U`, "");
 		if (json?.[0]?.TAG !== "#EXTM3U") json.unshift({ "TAG": "#EXTM3U" })
 		const OPTION_value_Regex = /^((-?\d+[x.\d]+)|[0-9A-Z-]+)$/;
 		let m3u8 = json.map(item => {
-			if (typeof item?.OPTION == "object") item.OPTION = Object.entries(item.OPTION).map(option => {
+			if (typeof item?.OPTION === "object") item.OPTION = Object.entries(item.OPTION).map(option => {
 				if (item?.TAG === "#EXT-X-SESSION-DATA") option[1] = `"${option[1]}"`;
 				else if (!isNaN(option[1])) option[1] = (typeof option[1] === "number") ? option[1] : `"${option[1]}"`;
-				else if (option[0] === "INSTREAM-ID") option[1] = `"${option[1]}"`;
+				else if (option[0] === "INSTREAM-ID" || option[0] === "KEYFORMAT") option[1] = `"${option[1]}"`;
 				else if (!OPTION_value_Regex.test(option[1])) option[1] = `"${option[1]}"`;
 				return option.join("=");
 			}).join(",");
@@ -42,7 +37,6 @@ export class EXTM3U {
 						: (item?.NOTE) ? item.NOTE
 							: "";
 		}).join(this.newLine);
-		console.log(`✅ ${this.name}, stringify EXTM3U`, `m3u8: ${m3u8}`, "");
 		return m3u8
 	};
 };

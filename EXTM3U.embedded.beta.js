@@ -2,7 +2,7 @@
 function EXTM3U(opts) {
 	return new (class {
 		constructor(opts) {
-			this.name = "EXTM3U v0.8.4";
+			this.name = "EXTM3U v0.8.5";
 			this.opts = opts;
 			this.newLine = (this.opts.includes("\n")) ? "\n" : (this.opts.includes("\r")) ? "\r" : (this.opts.includes("\r\n")) ? "\r\n" : "\n";
 		};
