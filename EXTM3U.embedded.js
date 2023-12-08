@@ -2,7 +2,7 @@
 function EXTM3U(opts) {
 	return new (class {
 		constructor(opts) {
-			this.name = "EXTM3U v0.8.5";
+			this.name = "EXTM3U v0.8.6";
 			this.opts = opts;
 			this.newLine = (this.opts.includes("\n")) ? "\n" : (this.opts.includes("\r")) ? "\r" : (this.opts.includes("\r\n")) ? "\r\n" : "\n";
 		};
@@ -28,7 +28,7 @@ function EXTM3U(opts) {
 				if (typeof item?.OPTION === "object") item.OPTION = Object.entries(item.OPTION).map(option => {
 					if (item?.TAG === "#EXT-X-SESSION-DATA") option[1] = `"${option[1]}"`;
 					else if (!isNaN(option[1])) option[1] = (typeof option[1] === "number") ? option[1] : `"${option[1]}"`;
-					else if (option[0] === "INSTREAM-ID" || option[0] === "KEYFORMAT") option[1] = `"${option[1]}"`;
+					else if (option[0] === "ID" || option[0] === "INSTREAM-ID" || option[0] === "KEYFORMAT") option[1] = `"${option[1]}"`;
 					else if (!OPTION_value_Regex.test(option[1])) option[1] = `"${option[1]}"`;
 					return option.join("=");
 				}).join(",");
