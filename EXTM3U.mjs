@@ -1,5 +1,5 @@
 // refer: https://datatracker.ietf.org/doc/html/draft-pantos-http-live-streaming-08
-export class EXTM3U {
+export default class EXTM3U {
 	constructor(opts) {
 		this.name = "EXTM3U v0.8.6";
 		this.opts = opts;
