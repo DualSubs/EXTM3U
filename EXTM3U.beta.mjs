@@ -1,7 +1,7 @@
 // refer: https://datatracker.ietf.org/doc/html/draft-pantos-http-live-streaming-08
 export default class EXTM3U {
 	static name = "EXTM3U";
-	static version = "0.8.7";
+	static version = "0.8.8";
 	static about = () => console.log(`\n🟧 ${this.name} v${this.version}\n`);
 	static #EXTM3URegex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:(?:\r\n|\r|\n)(?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)(?:\r\n|\r|\n)?$/gm;
 	static #OPTIONValueRegex = /^((-?\d+[x.\d]+)|[0-9A-Z-]+)$/;
@@ -12,7 +12,7 @@ export default class EXTM3U {
 		//const EXTM3U_Regex = /^(?:[\s\r\n]{1})|(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)|(?<NOTE>#.+))(?::(?<OPTION>.+))?[\s\r\n]?(?<URI>[^#\s\r\n]+)?$/gm;
 		//const EXTM3U_Regex = /^(((?<TAG>#(EXT|AIV)[^#:\s\r\n]+)(:(?<OPTION>[^\r\n]+))?([\r\n](?<URI>[^#\s\r\n]+))?)|(?<NOTE>#[^\r\n]+))[\r\n]?$/gm;
 		//const EXTM3U_Regex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:[\r\n](?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)[\r\n]?$/gm;
-		const EXTM3U_Regex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:(?:\r\n|\r|\n)(?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)(?:\r\n|\r|\n)?$/gm;
+		//const EXTM3U_Regex = /^(?:(?<TAG>#(?:EXT|AIV)[^#:\s\r\n]+)(?::(?<OPTION>[^\r\n]+))?(?:(?:\r\n|\r|\n)(?<URI>[^#\s\r\n]+))?|(?<NOTE>#[^\r\n]+)?)(?:\r\n|\r|\n)?$/gm;
 		//let array = [...m3u8.matchAll(EXTM3U_Regex)]
 		//array.forEach(item => console.log(`🚧 ${this.name}, parse EXTM3U, item.groups: ${JSON.stringify(item?.groups)}`, ""));
 		let json = [...m3u8.matchAll(this.#EXTM3URegex)].map(item => {
@@ -20,7 +20,7 @@ export default class EXTM3U {
 			//console.log(`🚧 ${this.name}, parse EXTM3U`, `before: item.OPTION.split(/,\s*(?![^"]*",)/) ${JSON.stringify(`${item.OPTION}\,`?.split(/,\s*(?![^"]*",)/) ?? "")}`, "");
 			if (/=/.test(item?.OPTION)) item.OPTION = Object.fromEntries(`${item.OPTION}\,`.split(/,\s*(?![^"]*",)/).slice(0, -1).map(option => {
 				option = option.split(/=(.*)/);
-				option[1] = (isNaN(option[1])) ? option[1].replace(/^"(.*)"$/, "$1") : parseInt(option[1], 10);
+				option[1] = (isNaN(option[1])) ? option[1].replace(/^"(.*)"$/, "$1") : parseFloat(option[1]);
 				return option;
 			}));
 			return item
